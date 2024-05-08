@@ -93,7 +93,7 @@ def simulacion_de_pases():
     archivo_de_pases = open('./pases.txt', 'a')
     
     n = 1
-    while n <= 10:
+    while n <= 50000:
         equipo = random.choice([0,1])
         exito = random.choice([0,1])
         jugadora = random.choice(equipos[equipo])
