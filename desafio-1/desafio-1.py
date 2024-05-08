@@ -5,6 +5,7 @@ import os
 # Matriz de equipos con sus respectivas jugadoras - Cada elemento del array es un equipo
 # equipos["Argentina"] = Argentina - Cada elemento del array es una tupla con el nombre de la jugadora y su número
 # equipos["Australia"] = Australia - Cada elemento del array es una tupla con el nombre de la jugadora y su número
+
 equipos = {
     "Argentina":[
         ("Luciana Aymar", 8),
@@ -32,6 +33,7 @@ equipos = {
     ],
 }
 
+
 def crear_archivo():
     if not os.path.exists('./pases.txt'):
         open('./pases.txt', 'x').close()
@@ -49,18 +51,6 @@ def eliminar_archivo():
         print("El archivo de pases no existe")
         
     mostrar_menu(2)
-
-def leer_pases_especificos():
-    pases_from = int(input("Ingrese desde qué pase quiere leer: "))
-    while pases_from <= 0:
-        pases_from = int(input("El número de pase debe ser mayor a 0.\n Ingrese desde qué pase quiere leer: \n"))
-
-    pases_to = int(input("Ingrese hasta qué pase quiere leer: "))
-    while pases_to < pases_from or pases_to <= 0:
-        pases_to = int(input("El número de pase debe ser mayor al de inicio.\n Ingrese hasta qué pase quiere leer: \n"))
-
-    pases_desde_hasta = (pases_from, pases_to)
-    leer_pases(pases_desde_hasta)
 
 def leer_pases (pases_desde_hasta = False):
     archivo_de_pases = os.path.exists('./pases.txt')
@@ -84,21 +74,44 @@ def leer_pases (pases_desde_hasta = False):
 
     archivo_de_pases.close()
     mostrar_menu(2)
-        
+
+def leer_pases_especificos():
+    pases_from = int(input("Ingrese desde qué pase quiere leer: "))
+    while pases_from <= 0:
+        pases_from = int(input("El número de pase debe ser mayor a 0.\n Ingrese desde qué pase quiere leer: \n"))
+
+    pases_to = int(input("Ingrese hasta qué pase quiere leer: "))
+    while pases_to < pases_from or pases_to <= 0:
+        pases_to = int(input("El número de pase debe ser mayor al de inicio.\n Ingrese hasta qué pase quiere leer: \n"))
+
+    pases_desde_hasta = (pases_from, pases_to)
+    leer_pases(pases_desde_hasta)
+
+def simular_partido():
+    equipo = int(input("Ingresá el equipo con el que querés jugar:\n1. Argentina\n2. Australia\n"))
+    
+    while equipo < 1 or equipo > 2:
+        print("Opción inválida")
+        equipo = int(input("Ingresá el equipo con el que querés jugar:\n1. Argentina\n2. Australia\n"))
+    
+    if equipo == 1:
+        equipo = "Argentina"
+    else:
+        equipo = "Australia"
+
 def simulacion_de_pases():
     archivo_de_pases = open('./pases.txt', 'w')
     
     n = 1
-    while n <= 50000:
+    while n <= 50:
         equipo = random.choice(['Argentina','Australia'])
         exito = random.choice([0,1])
         jugadora = random.choice(equipos[equipo])
         minuto = random.randint(0, 70)
-        
         pase = f"{equipo};{jugadora[1]};{exito};{jugadora[0]};{minuto}"
         
         archivo_de_pases.write(pase + "\n")
-        
+    
         n += 1
 
     archivo_de_pases.close()
@@ -108,15 +121,15 @@ def simulacion_de_pases():
 menu_opciones = [
     [
         {"etiqueta": "Crear archivo de pases", "funcion": crear_archivo},
-        {"etiqueta": "Leer archivo de pases", "funcion": leer_pases},
         {"etiqueta": "Escribir simulación de pases (50.000)", "funcion": simulacion_de_pases},
+        {"etiqueta": "Leer archivo de pases", "funcion": leer_pases},
         {"etiqueta": "Eliminar archivo de pases", "funcion": eliminar_archivo},
         {"etiqueta": "Salir", "funcion": print},
     ],
     [
         {"etiqueta": "Leer todos los pases", "funcion": leer_pases},
         {"etiqueta": "Leer pases desde y hasta un número específico", "funcion": leer_pases_especificos},
-        {"etiqueta": "Volver atrás", "funcion": False},
+        {"etiqueta": "Volver atrás", "funcion": print},
         {"etiqueta": "Salir", "funcion": print},
     ],
     [
