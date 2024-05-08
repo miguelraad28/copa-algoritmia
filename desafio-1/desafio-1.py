@@ -3,10 +3,10 @@ import random
 import os
 
 # Matriz de equipos con sus respectivas jugadoras - Cada elemento del array es un equipo
-# equipos[0] = Argentina - Cada elemento del array es una tupla con el nombre de la jugadora y su número
-# equipos[1] = Australia - Cada elemento del array es una tupla con el nombre de la jugadora y su número
-equipos = [
-    [
+# equipos["Argentina"] = Argentina - Cada elemento del array es una tupla con el nombre de la jugadora y su número
+# equipos["Australia"] = Australia - Cada elemento del array es una tupla con el nombre de la jugadora y su número
+equipos = {
+    "Argentina":[
         ("Luciana Aymar", 8),
         ("Delfina Merino", 19),
         ("Carla Rebecchi", 32),
@@ -18,7 +18,7 @@ equipos = [
         ("Eugenia Trinchinetti", 17),
         ("Julieta Jankunas", 23)
     ],
-    [
+    "Australia":[
         ("Jodie Kenny", 32),
         ("Emily Chalker", 23),
         ("Madison Fitzpatrick", 3),
@@ -30,7 +30,7 @@ equipos = [
         ("Gabrielle Nance", 10),
         ("Madi Ratcliffe", 14)
     ],
-]
+}
 
 def crear_archivo():
     if not os.path.exists('./pases.txt'):
@@ -49,10 +49,6 @@ def eliminar_archivo():
         print("El archivo de pases no existe")
         
     mostrar_menu(2)
-
-def escribir_pase(pase, archivo_de_pases):
-    archivo_de_pases.write(pase + "\n")
-    return archivo_de_pases
 
 def leer_pases_especificos():
     pases_from = int(input("Ingrese desde qué pase quiere leer: "))
@@ -90,23 +86,18 @@ def leer_pases (pases_desde_hasta = False):
     mostrar_menu(2)
         
 def simulacion_de_pases():
-    archivo_de_pases = open('./pases.txt', 'a')
+    archivo_de_pases = open('./pases.txt', 'w')
     
     n = 1
     while n <= 50000:
-        equipo = random.choice([0,1])
+        equipo = random.choice(['Argentina','Australia'])
         exito = random.choice([0,1])
         jugadora = random.choice(equipos[equipo])
         minuto = random.randint(0, 70)
         
-        if equipo == 0:
-            team_name = 'Argentina'
-        else:
-            team_name = 'Australia'
+        pase = f"{equipo};{jugadora[1]};{exito};{jugadora[0]};{minuto}"
         
-        pase = f"{team_name};{jugadora[1]};{exito};{jugadora[0]};{minuto}"
-        
-        escribir_pase(pase, archivo_de_pases)
+        archivo_de_pases.write(pase + "\n")
         
         n += 1
 
