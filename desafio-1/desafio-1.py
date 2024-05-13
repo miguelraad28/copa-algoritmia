@@ -86,8 +86,8 @@ def leer_pases (pases_desde_hasta = False):
         # Sea la opción de mostrarlos todos, o un segmento, al final recorremos el array de pases e imprimimos cada uno de ellos
         for pase in pases:
             print(pase)
-    # Cerramos el archivo para evitar conflictos
-    archivo_de_pases.close()
+        # Cerramos el archivo para evitar conflictos
+        archivo_de_pases.close()
     # Mostramos el menu para Seleccionar una nueva opción o salir
     mostrar_menu(2)
 
