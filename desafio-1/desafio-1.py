@@ -139,6 +139,36 @@ def simulacion_de_pases():
     # Mostramos el menu para Seleccionar una nueva opción o salir
     mostrar_menu(2)
 
+# Contar pases y efectividad
+def contar_pases_y_efectividad():
+    archivo_de_pases = os.path.exists('./pases.txt')
+    # En el caso de no existir el archivo, le indicamos al usuario
+    if not archivo_de_pases:
+        print("\nNo se encontró el archivo de pases\n")
+    else:
+        archivo_de_pases = open('./pases.txt', 'r')
+        pases = archivo_de_pases.readlines()
+        
+        pases_y_efectividad = {'Argentina':[], 'Australia': []}
+        
+        for equipo in equipos:
+            for jugadora in equipos[equipo]:
+                cuenta = {'numero': jugadora[1], 'nombre':jugadora[0], 'cantidad_pases': 0, 'pases_bien': 0, 'pases_mal': 0 }
+                for pase in pases:
+                    if pase.startswith(f"{equipo};{jugadora[1]};{jugadora[0]}"):
+                        cuenta["cantidad_pases"] += 1
+                        if pase.startswith(f"{equipo};{jugadora[1]};{jugadora[0]};1"):
+                            cuenta['pases_bien'] += 1
+                        else:
+                            cuenta['pases_mal'] += 1
+                cuenta['porcentaje'] = round(((cuenta['pases_bien'] / cuenta["cantidad_pases"]) * 100), 2)
+                pases_y_efectividad[equipo].append(cuenta)
+            ordeando_por_porcentaje = sorted(pases_y_efectividad[equipo], key=lambda x: x['porcentaje'], reverse=True)
+            pases_y_efectividad[equipo] = ordeando_por_porcentaje
+        print(pases_y_efectividad)
+        archivo_de_pases.close()
+    mostrar_menu(2)
+
 # Matriz de opciones de menú
 # menu_opciones[0] = Hace referencia al menu inicial/principal del programa
 # menu_opciones[1] = Hace referencia al menu de lectura de pases
@@ -150,6 +180,7 @@ menu_opciones = [
         {"etiqueta": "Escribir simulación de pases (50.000)", "funcion": simulacion_de_pases},
         {"etiqueta": "Leer archivo de pases", "funcion": leer_pases},
         {"etiqueta": "Eliminar archivo de pases", "funcion": eliminar_archivo},
+        {"etiqueta": "Contar pases y efectividad", "funcion": contar_pases_y_efectividad},
         {"etiqueta": "Salir", "funcion": print},
     ],
     [
