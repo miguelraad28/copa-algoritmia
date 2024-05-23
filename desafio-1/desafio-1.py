@@ -11,28 +11,28 @@ import os
 
 equipos = {
     "Argentina":[
-        ("Luciana Aymar", 8),
-        ("Delfina Merino", 19),
-        ("Carla Rebecchi", 32),
-        ("Agustina Albertario", 15),
-        ("Florencia Habif", 6),
-        ("Noel Barrionuevo", 12),
-        ("Sofía Toccalino", 2),
-        ("Victoria Sauze", 24),
-        ("Eugenia Trinchinetti", 17),
-        ("Julieta Jankunas", 23)
+        "Luciana Aymar",
+        "Delfina Merino",
+        "Carla Rebecchi",
+        "Agustina Albertario",
+        "Florencia Habif",
+        "Noel Barrionuevo",
+        "Sofía Toccalino",
+        "Victoria Sauze",
+        "Eugenia Trinchinetti",
+        "Julieta Jankunas",
     ],
     "Australia":[
-        ("Jodie Kenny", 32),
-        ("Emily Chalker", 23),
-        ("Madison Fitzpatrick", 3),
-        ("Brooke Peris", 4),
-        ("Savannah Fitzpatrick", 19),
-        ("Karri McMahon", 21),
-        ("Ambrosia Malone", 11),
-        ("Jocelyn Bartram", 1),
-        ("Gabrielle Nance", 10),
-        ("Madi Ratcliffe", 14)
+        "Jodie Kenny",
+        "Emily Chalker",
+        "Madison Fitzpatrick",
+        "Brooke Peris",
+        "Savannah Fitzpatrick",
+        "Karri McMahon",
+        "Ambrosia Malone",
+        "Jocelyn Bartram",
+        "Gabrielle Nance",
+        "Madi Ratcliffe",
     ],
 }
 
@@ -152,20 +152,21 @@ def contar_pases_y_efectividad():
         pases_y_efectividad = {'Argentina':[], 'Australia': []}
         
         for equipo in equipos:
-            for jugadora in equipos[equipo]:
-                cuenta = {'numero': jugadora[1], 'nombre':jugadora[0], 'cantidad_pases': 0, 'pases_bien': 0, 'pases_mal': 0 }
-                for pase in pases:
-                    if pase.startswith(f"{equipo};{jugadora[1]};{jugadora[0]}"):
-                        cuenta["cantidad_pases"] += 1
-                        if pase.startswith(f"{equipo};{jugadora[1]};{jugadora[0]};1"):
-                            cuenta['pases_bien'] += 1
-                        else:
-                            cuenta['pases_mal'] += 1
-                cuenta['porcentaje'] = round(((cuenta['pases_bien'] / cuenta["cantidad_pases"]) * 100), 2)
-                pases_y_efectividad[equipo].append(cuenta)
-            ordeando_por_porcentaje = sorted(pases_y_efectividad[equipo], key=lambda x: x['porcentaje'], reverse=True)
-            pases_y_efectividad[equipo] = ordeando_por_porcentaje
-        print(pases_y_efectividad)
+            print(equipos[equipo])
+            # for jugadora in equipos[equipo]:
+            #     cuenta = {'numero': jugadora[1], 'nombre':jugadora[0], 'cantidad_pases': 0, 'pases_bien': 0, 'pases_mal': 0 }
+            #     for pase in pases:
+            #         if pase.startswith(f"{equipo};{jugadora[1]};{jugadora[0]}"):
+            #             cuenta["cantidad_pases"] += 1
+            #             if pase.startswith(f"{equipo};{jugadora[1]};{jugadora[0]};1"):
+            #                 cuenta['pases_bien'] += 1
+            #             else:
+            #                 cuenta['pases_mal'] += 1
+            #     cuenta['porcentaje'] = round(((cuenta['pases_bien'] / cuenta["cantidad_pases"]) * 100), 2)
+            #     pases_y_efectividad[equipo].append(cuenta)
+            # ordeando_por_porcentaje = sorted(pases_y_efectividad[equipo], key=lambda x: x['porcentaje'], reverse=True)
+            # pases_y_efectividad[equipo] = ordeando_por_porcentaje
+        # print(pases_y_efectividad)
         archivo_de_pases.close()
     mostrar_menu(2)
 
