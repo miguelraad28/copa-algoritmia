@@ -60,21 +60,21 @@ async def verificar_ganador(MS):
     if MS:
         print("Modo muerte subita")
     else:
-    faltantes_argentina = 5 - len(marcadores['argentina'])
-    goles_argentina = sum(1 for x in marcadores["argentina"] if x == '🟩')
-    faltantes_paises_bajos = 5 - len(marcadores['paises_bajos'])
-    goles_paises_bajos = sum(1 for x in marcadores["paises_bajos"] if x == '🟩')
-    if faltantes_argentina + goles_argentina < goles_paises_bajos:
-        print("Gana Países Bajos pero porque compraron al árbitro >:V")
-        return -1
-    elif faltantes_paises_bajos + goles_paises_bajos < goles_argentina:
-        print("GANA ARGENTINA :D")
-        return -1
-    elif len(marcadores["argentina"]) == 5 and len(marcadores["paises_bajos"]) == 5:
-        marcadores["argentina"] = []
-        marcadores["paises_bajos"] = []
-        await iniciar_muerte_subita()
-        return -1
+        faltantes_argentina = 5 - len(marcadores['argentina'])
+        goles_argentina = sum(1 for x in marcadores["argentina"] if x == '🟩')
+        faltantes_paises_bajos = 5 - len(marcadores['paises_bajos'])
+        goles_paises_bajos = sum(1 for x in marcadores["paises_bajos"] if x == '🟩')
+        if faltantes_argentina + goles_argentina < goles_paises_bajos:
+            print("Gana Países Bajos pero porque compraron al árbitro >:V")
+            return -1
+        elif faltantes_paises_bajos + goles_paises_bajos < goles_argentina:
+            print("GANA ARGENTINA :D")
+            return -1
+        elif len(marcadores["argentina"]) == 5 and len(marcadores["paises_bajos"]) == 5:
+            marcadores["argentina"] = []
+            marcadores["paises_bajos"] = []
+            await iniciar_muerte_subita()
+            return -1
 
 async def patear(equipo, num, MS):
     fila = (num - 1) // 3
