@@ -1,8 +1,7 @@
-
-# asyncio está importado con la finalidad de una mejor UX, ya que se pueden hacer esperas de tiempo
+# time está importado con la finalidad de una mejor UX, ya que se pueden hacer esperas de tiempo
 # para que el usuario pueda ver el resultado de la pateada, a dónde fué el balón
 # mensajes de euforia y mientras la computadora "Países Bajos" "piensa" a dónde patear
-import asyncio
+import time
 # random se importa para que Países Bajos pueda patear a un lugar aleatorio
 import random
 
@@ -26,19 +25,19 @@ global modo_muerte_subita
 modo_muerte_subita = False
 
 # Función dedicada a iniciar un nuevo ciclo sin importar que equipo pateó por última vez
-async def iniciar_muerte_subita():
+def iniciar_muerte_subita():
     # Cambiamos el valor global de modo_muerte_subita para ciertos condicionales que están al rededor de la app.
     global modo_muerte_subita
     modo_muerte_subita = True
     # Iniciamos la muérte súbita, nuevamente Argentina inicia a patear
     imprimir_arco()
-    await selecciona_tiro_argentina()
+    selecciona_tiro_argentina()
 
 # Función para en base al último equipo que pateó, cambiar al otro equipo
-async def cambia_equipo(equipo):
+def cambia_equipo(equipo):
     # Si num == -1 significa que algún equipo ya ganó el partido o se inicia el ciclo de muerte súbita
     # De esta forma cortamos el flujo del juego (Y en caso de ser muerte súbita se inicia el ciclo con la llamada a la función iniciar_muerte_subita())
-    num = await verificar_ganador()
+    num = verificar_ganador()
     if num == -1: 
         return
 
@@ -48,18 +47,17 @@ async def cambia_equipo(equipo):
     
     # Si el equipo que patea, volvemos a la función del flujo inicial, donde se solicita al usuario un número
     if equipo == 'argentina':
-        await selecciona_tiro_argentina()
+        selecciona_tiro_argentina()
     else:
-        # Si el equipo que patea es países bajos, le hacemos saber al usuario, y hacemos una espera
-        # de 2 segundos mientras Países bajos "piensa" a donde patear
         print("\nPATEA PAÍSES BAJOS")
-        await asyncio.sleep(2)
+        selecciona_atajada_argentina()
+        time.sleep(2)
         num = random.randint(1, 9)
         # Ejecutamos la pateada y repetimos flujo.
-        await patear('paises_bajos', num)
+        patear('paises_bajos', num)
 
 # Esta función se encarga de verificar el ganador
-async def verificar_ganador():
+def verificar_ganador():
     # Se utiliza la ejecución de este if para ver el ganador en caso de estar en modo muerte súbita
     if modo_muerte_subita:
         # Nos interesa saber si hay ganador en muerte súbita cuando ya ambos equipos patearon, así que primero validamos eso.
@@ -69,8 +67,8 @@ async def verificar_ganador():
                 marcadores["argentina"] = []
                 marcadores["paises_bajos"] = []
                 print("\n💀💀 Otra ronda más!!! 😨😧")
-                await asyncio.sleep(2)
-                await iniciar_muerte_subita()
+                time.sleep(2)
+                iniciar_muerte_subita()
                 return -1
 
             elif marcadores["argentina"][0] == '🟩' and marcadores["paises_bajos"][0] == '🟥':
@@ -110,34 +108,52 @@ async def verificar_ganador():
             marcadores["paises_bajos"] = []
             # Inicio de cilo de muerte súbita
             print("\n\n☠️ ¡Inicia la muerte súbita! ☠️\n")
-            await iniciar_muerte_subita()
+            iniciar_muerte_subita()
             # El return del -1 es para cortar el flujo del juego
             # En este caso, es previamente llamada a la función iniciar_muerte_subita() para empezar un ciclo de muerte súbita
             return -1
 
-async def patear(equipo, num):
+def patear(equipo, num_pateada, num_atajada = 0):
     # Identificámos en qué lugar de la matriz se encuentra el número ingresado por el usuario
-    fila = (num - 1) // 3
-    columna = (num - 1) % 3
+    fila_pateada = (num_pateada - 1) // 3
+    columna_pateada = (num_pateada - 1) % 3
     
-    # Actualizar la posición en el arco con "⚽" para mostrarle visualmente al usuario a dónde fué el balón/disco
-    arco[fila][columna] = "⚽"
-    
-    # El éxito del tiro siempre será True, a menos que se haya seleccionado 2, 5 u 8
+    # Si patea Argentina num_atajada será 0, por lo que países bajos siempre ataja en 2, 5 u 8
+    # Y si patea Países Bajos, ingresa número de atajada (!= 0) Y si Países Bajos patea al número que
+    # Argentina eligió atajar (num_atajada), entonces no es gol (exito = False)
+    nums_a_atajar =  [num_atajada] if num_atajada != 0 else [2,5,8]
     exito = True
-    if num in [2,5,8]:
+    if num_pateada in nums_a_atajar:
         exito = False
 
+    # Este código es meramente para que cuando Argentina patee también se simulen las manitos del arquero de países bajos (Por más que siempre ataje sólo en 2, 5 u 8)
+    if num_atajada == 0:
+        todos_numeros = list(range(1, 10))
+        todos_numeros.remove(num_pateada)
+        num_atajada = random.choice(todos_numeros)
+    
+    fila_atajada = (num_atajada - 1) // 3
+    columna_atajada = (num_atajada - 1) % 3
+
+    # Actualizar la posición en el arco con "⚽" para mostrarle visualmente al usuario a dónde fué el balón/disco
+    arco[fila_pateada][columna_pateada] = "⚽" if exito else "🧤⚽"
+    # Si la pateada no está en los por defento que ataja Países Bajos (2, 5, 8) y no es el mismo número que atajó,
+    # Simulamos como si Países Bajos atajara en otro lugar que no fué donde pateó argentina
+    # (Por más que siempre ataje sólo en 2, 5 u 8, es SOLO visual)
+    if num_pateada not in [2,5,8] and num_atajada != num_pateada:
+        arco[fila_atajada][columna_atajada] = "🧤"
     # Actualizamos el marcador y mostramos el arco con el nuevo marcador y mostrándo a dónde se pateó
     actualizar_marcador(equipo, exito)
     imprimir_arco()
 
     # Volvemos a poner el número en la posición del arco
-    arco[fila][columna] = num
+    arco[fila_pateada][columna_pateada] = num_pateada
+    if num_atajada != num_pateada:
+        arco[fila_atajada][columna_atajada] = num_atajada
 
     # Un par de mensajes de eufória del partido Jeje.
     if exito and equipo == 'argentina':
-        print("🏑¡GOL DE ARGENTINAAAAAAA VAMOOOOOOOOOOS 🍻🍾🎆🎇!")
+        print("⚽¡GOL DE ARGENTINAAAAAAA VAMOOOOOOOOOOS 🍻🍾🎆🎇!")
     elif not exito and equipo == 'argentina':
         print('AAAA CASI METEMOS GOOOL 😭😭😭')
     elif exito and equipo == 'paises_bajos':
@@ -146,10 +162,10 @@ async def patear(equipo, num):
         print("Uff por poco nos meten gol 😅😅")
 
     # Esperamos 3 segundos para que el usuario pueda ver el resultado del tiro
-    await asyncio.sleep(3)
+    time.sleep(3)
     
     # Cambio de equipo
-    await cambia_equipo(equipo)
+    cambia_equipo(equipo)
 
 def actualizar_marcador(equipo, exito):
     exito = "🟩" if exito else "🟥"
@@ -204,21 +220,38 @@ def validar_input(num):
         return -1
 
 # Función para permitir al usuario ingresar a dónde quiere patear
-async def selecciona_tiro_argentina():
-    num = input("\nPATEA ARGENTINA: Ingrese el número de tiro: ")
+def selecciona_tiro_argentina():
+    num = input("\nPATEA ARGENTINA 🦿: Ingrese el número de tiro: ")
 
     # Validez de número entero
-    num_int = validar_input(num)
+    num_pateada = validar_input(num)
     
     # Mientras sea menor a 1 o mayor a 9 vuelve a solicitar
-    while num_int < 1 or num_int > 9:
+    while num_pateada < 1 or num_pateada > 9:
         print("Ingrese un número válido entre 1 y 9")
-        num = input("\nPATEA ARGENTINA: Ingrese el número de tiro: ")
-        num_int = validar_input(num)
+        num = input("\nPATEA ARGENTINA 🦿: Ingrese el número de tiro: ")
+        num_pateada = validar_input(num)
     
-    # Pateamos, enviandole el equipo que patea, y a dónde (num_int)
-    await patear('argentina', num_int)
+    # Pateamos, enviandole el equipo que patea, y a dónde (num_pateada)
+    patear('argentina', num_pateada)
+    
+def selecciona_atajada_argentina():
+    num = input("\nATAJA ARGENTINA 🧤: Ingrese el número donde atajar: ")
+
+    # Validez de número entero
+    num_atajada = validar_input(num)
+    
+    # Mientras sea menor a 1 o mayor a 9 vuelve a solicitar
+    while num_atajada < 1 or num_atajada > 9:
+        print("Ingrese un número válido entre 1 y 9")
+        num = input("\ATAJA ARGENTINA 🧤: Ingrese el número donde atajar: ")
+        num_atajada = validar_input(num)
+    
+    # Se genera un número aleatorio para que Países Bajos patee a un lugar aleatorio
+    num_pateada = random.randint(1, 9)
+    # Pateamos, enviandole el equipo que patea, y a dónde (num_atajada)
+    patear('paises_bajos', num_pateada, num_atajada)
 
 # Inicialización del programa
 imprimir_arco()
-asyncio.run(selecciona_tiro_argentina())
+selecciona_tiro_argentina()
