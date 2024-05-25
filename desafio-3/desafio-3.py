@@ -7,15 +7,15 @@ import random
 
 # Matriz que representa el arco de fútbol
 arco = [
-  [1,2,3],
-  [4,5,6],
-  [7,8,9],
+    [1,2,3],
+    [4,5,6],
+    [7,8,9],
 ]
 
 # Diccionario que contiene los marcadores de cada equipo
 marcadores = {
-  'argentina': [],
-  'paises_bajos': [],
+    'argentina': [],
+    'paises_bajos': [],
 }
 
 # Variable global que indica si estamos en modo muerte súbita o no
@@ -35,12 +35,6 @@ def iniciar_muerte_subita():
 
 # Función para en base al último equipo que pateó, cambiar al otro equipo
 def cambia_equipo(equipo):
-    # Si num == -1 significa que algún equipo ya ganó el partido o se inicia el ciclo de muerte súbita
-    # De esta forma cortamos el flujo del juego (Y en caso de ser muerte súbita se inicia el ciclo con la llamada a la función iniciar_muerte_subita())
-    num = verificar_ganador()
-    if num == -1: 
-        return
-
     # Según el equipo que haya pateado, le toca al contrario.
     equipo = 'paises_bajos' if equipo == 'argentina' else 'argentina'
     imprimir_arco()
@@ -51,10 +45,6 @@ def cambia_equipo(equipo):
     else:
         print("\nPATEA PAÍSES BAJOS")
         selecciona_atajada_argentina()
-        time.sleep(2)
-        num = random.randint(1, 9)
-        # Ejecutamos la pateada y repetimos flujo.
-        patear('paises_bajos', num)
 
 # Esta función se encarga de verificar el ganador
 def verificar_ganador():
@@ -82,6 +72,7 @@ def verificar_ganador():
                 print("\n💢 Gana Países Bajos la muerte súbita pero porque compraron al árbitro 💲")
                 # Al retornar -1 y no llamar a la función iniciar_muerte_subita(), el programa finaliza con este mensaje.
                 return -1
+
     else:
         # En caso de no estar en muerte súbita, se verifica si ya hay un ganador del partido
         faltantes_argentina = 5 - len(marcadores['argentina'])
@@ -89,18 +80,18 @@ def verificar_ganador():
 
         faltantes_paises_bajos = 5 - len(marcadores['paises_bajos'])
         goles_paises_bajos = sum(1 for x in marcadores["paises_bajos"] if x == '🟩')
-
+            # 5 < 2
         if faltantes_argentina + goles_argentina < goles_paises_bajos:
             # Validación si ya Argentina no tiene posibilidad de ganarle a países bajos
             print("💢 Gana Países Bajos pero porque compraron al árbitro 💲")
             # El return del -1 es para cortar el flujo del juego
-            return -1
+            exit()
 
         elif faltantes_paises_bajos + goles_paises_bajos < goles_argentina:
             # Validación si ya Países Bajos no tiene posibilidad de ganarle a países bajos
             print("🎊🙌🏻🎇🎆🍾🍻 ¡¡GANA ARGENTINA!! 🍻🎆🍾🎇🙌🏻")
             # El return del -1 es para cortar el flujo del juego
-            return -1
+            exit()
 
         elif len(marcadores["argentina"]) == 5 and len(marcadores["paises_bajos"]) == 5:
             # Reiniciamos los contadores para la muerte súbita
@@ -118,38 +109,30 @@ def patear(equipo, num_pateada, num_atajada = 0):
     fila_pateada = (num_pateada - 1) // 3
     columna_pateada = (num_pateada - 1) % 3
     
-    # Si patea Argentina num_atajada será 0, por lo que países bajos siempre ataja en 2, 5 u 8
-    # Y si patea Países Bajos, ingresa número de atajada (!= 0) Y si Países Bajos patea al número que
-    # Argentina eligió atajar (num_atajada), entonces no es gol (exito = False)
-    nums_a_atajar =  [num_atajada] if num_atajada != 0 else [2,5,8]
-    exito = True
-    if num_pateada in nums_a_atajar:
-        exito = False
-
-    # Este código es meramente para que cuando Argentina patee también se simulen las manitos del arquero de países bajos (Por más que siempre ataje sólo en 2, 5 u 8)
-    if num_atajada == 0:
-        todos_numeros = list(range(1, 10))
-        todos_numeros.remove(num_pateada)
-        num_atajada = random.choice(todos_numeros)
+    # Por una cuestión visual, si el número pateado es 2, 5 u 8, se ataja en el mismo lugar así la manito sale junto al balón
+    if num_pateada in [2,5,8]:
+        num_atajada = num_pateada
     
     fila_atajada = (num_atajada - 1) // 3
     columna_atajada = (num_atajada - 1) % 3
+    
+    exito = True
+    
+    if num_pateada in [2,5,8] or num_pateada == num_atajada:
+        exito = False
+    
+    if num_pateada == num_atajada:
+        arco[fila_pateada][columna_pateada] = '🧤⚽'
+    else: 
+        arco[fila_pateada][columna_pateada] = '⚽'
+        arco[fila_atajada][columna_atajada] = '🧤'
 
-    # Actualizar la posición en el arco con "⚽" para mostrarle visualmente al usuario a dónde fué el balón/disco
-    arco[fila_pateada][columna_pateada] = "⚽" if exito else "🧤⚽"
-    # Si la pateada no está en los por defento que ataja Países Bajos (2, 5, 8) y no es el mismo número que atajó,
-    # Simulamos como si Países Bajos atajara en otro lugar que no fué donde pateó argentina
-    # (Por más que siempre ataje sólo en 2, 5 u 8, es SOLO visual)
-    if num_pateada not in [2,5,8] and num_atajada != num_pateada:
-        arco[fila_atajada][columna_atajada] = "🧤"
-    # Actualizamos el marcador y mostramos el arco con el nuevo marcador y mostrándo a dónde se pateó
     actualizar_marcador(equipo, exito)
     imprimir_arco()
 
     # Volvemos a poner el número en la posición del arco
     arco[fila_pateada][columna_pateada] = num_pateada
-    if num_atajada != num_pateada:
-        arco[fila_atajada][columna_atajada] = num_atajada
+    arco[fila_atajada][columna_atajada] = num_atajada
 
     # Un par de mensajes de eufória del partido Jeje.
     if exito and equipo == 'argentina':
@@ -164,8 +147,14 @@ def patear(equipo, num_pateada, num_atajada = 0):
     # Esperamos 3 segundos para que el usuario pueda ver el resultado del tiro
     time.sleep(3)
     
-    # Cambio de equipo
-    cambia_equipo(equipo)
+    # Si num == -1 significa que algún equipo ya ganó el partido o se inicia el ciclo de muerte súbita
+    # De esta forma cortamos el flujo del juego (Y en caso de ser muerte súbita se inicia el ciclo con la llamada a la función iniciar_muerte_subita())
+    num = verificar_ganador()
+    if num == -1:
+        return
+    else:
+        # Cambio de equipo
+        cambia_equipo(equipo)
 
 def actualizar_marcador(equipo, exito):
     exito = "🟩" if exito else "🟥"
@@ -232,8 +221,10 @@ def selecciona_tiro_argentina():
         num = input("\nPATEA ARGENTINA 🦿: Ingrese el número de tiro: ")
         num_pateada = validar_input(num)
     
+    # Se genera un número aleatorio para que Países Bajos ataje a un lugar aleatorio
+    num_atajada = random.randint(1, 9)
     # Pateamos, enviandole el equipo que patea, y a dónde (num_pateada)
-    patear('argentina', num_pateada)
+    patear('argentina', num_pateada, num_atajada)
     
 def selecciona_atajada_argentina():
     num = input("\nATAJA ARGENTINA 🧤: Ingrese el número donde atajar: ")
