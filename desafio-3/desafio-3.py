@@ -120,8 +120,8 @@ async def patear(equipo, num):
     fila = (num - 1) // 3
     columna = (num - 1) % 3
     
-    # Actualizar la posición en el arco con "🏑" para mostrarle visualmente al usuario a dónde fué el balón/disco
-    arco[fila][columna] = "🏑"
+    # Actualizar la posición en el arco con "⚽" para mostrarle visualmente al usuario a dónde fué el balón/disco
+    arco[fila][columna] = "⚽"
     
     # El éxito del tiro siempre será True, a menos que se haya seleccionado 2, 5 u 8
     exito = True
