@@ -16,22 +16,11 @@ marcadores = {
 async def iniciar_muerte_subita():
     imprimir_arco(True)
     await selecciona_tiro_argentina(True)
-    if len(marcadores["argentina"]):
-        tiro_argentina = marcadores["argentina"][0]
-    if len(marcadores["paises_bajos"]):
-        tiro_paises_bajos = marcadores["paises_bajos"][0]
 
-    while tiro_paises_bajos == '🟥' and tiro_argentina == '🟥' or tiro_paises_bajos == '🟩' and tiro_argentina == '🟩':
-        marcadores["argentina"] = []
-        marcadores["paises_bajos"] = []
-        print("Otra ronda más!!!")
-            # await asyncio.sleep(2)
-        await iniciar_muerte_subita()
-
-    if marcadores["paises_bajos"][0] == '🟩' and marcadores["argentina"][0] == '🟥':
-        print("Gana Países Bajos pero porque compraron al árbitro >:V")
-    elif marcadores["paises_bajos"][0] == '🟥' and marcadores["argentina"][0] == '🟩':
-        print("GANA ARGENTINAAAAA")
+    # if marcadores["paises_bajos"][0] == '🟩' and marcadores["argentina"][0] == '🟥':
+    #     print("Gana Países Bajos pero porque compraron al árbitro >:V")
+    # elif marcadores["paises_bajos"][0] == '🟥' and marcadores["argentina"][0] == '🟩':
+    #     print("GANA ARGENTINAAAAA")
 
 async def cambia_equipo(equipo, MS):
     # num = -1 es que alguien gano - num = -2 van a muerte súbita
@@ -50,15 +39,28 @@ async def cambia_equipo(equipo, MS):
         # Si el equipo que patea es países bajos, le hacemos saber al usuario, y hacemos una espera
         # de 2 segundos mientras Países bajos "piensa" a donde patear
         print("PATEA PAÍSES BAJOS")
-        # await asyncio.sleep(2)
-        num = 2#random.randint(1, 9)
+        ##await asyncio.sleep(2)
+        num = random.randint(1, 9) if MS else 2
         # Ejecutamos la pateada y repetimos flujo.
         await patear('paises_bajos', num, MS)
 #####
 
 async def verificar_ganador(MS):
-    if MS and len(marcadores["argentina"]) and len(marcadores["paises_bajos"]):
-        
+    if MS:
+        if len(marcadores["argentina"]) and len(marcadores["paises_bajos"]):
+            if marcadores["argentina"][0] == '🟩' and marcadores["paises_bajos"][0] == '🟩' or marcadores["argentina"][0] == '🟥' and marcadores["paises_bajos"][0] == '🟥':
+                marcadores["argentina"] = []
+                marcadores["paises_bajos"] = []
+                print("\nOtra ronda más!!!")
+                #await asyncio.sleep(2)
+                await iniciar_muerte_subita()
+                return -1
+            elif marcadores["argentina"][0] == '🟩' and marcadores["paises_bajos"][0] == '🟥':
+                print("GANA ARGENTINA LA MUERTE SÚBITA")
+                return -1
+            elif marcadores["paises_bajos"][0] == '🟩' and marcadores["argentina"][0] == '🟥':
+                print("Gana Países Bajos por muerte súbita. Pero porque compraron al árbitro >:V")
+                return -1
     else:
         faltantes_argentina = 5 - len(marcadores['argentina'])
         goles_argentina = sum(1 for x in marcadores["argentina"] if x == '🟩')
@@ -73,6 +75,7 @@ async def verificar_ganador(MS):
         elif len(marcadores["argentina"]) == 5 and len(marcadores["paises_bajos"]) == 5:
             marcadores["argentina"] = []
             marcadores["paises_bajos"] = []
+            print("\n\n☠️¡ Inicia la muerte súbita!☠️\n")
             await iniciar_muerte_subita()
             return -1
 
@@ -106,7 +109,7 @@ async def patear(equipo, num, MS):
         print("Uff por poco nos meten gol 😅😅")
 
     # Esperamos 3 segundos para que el usuario pueda ver el resultado del tiro
-    # await asyncio.sleep(3)
+    #await asyncio.sleep(3)
     
     # Cambio de equipo
     await cambia_equipo(equipo, MS)
