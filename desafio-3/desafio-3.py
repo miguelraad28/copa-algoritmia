@@ -217,7 +217,7 @@ def selecciona_tiro_argentina():
     
     # Mientras sea menor a 1 o mayor a 9 vuelve a solicitar
     while num_pateada < 1 or num_pateada > 9:
-        print("Ingrese un número válido entre 1 y 9")
+        print("\nIngrese un número válido entre 1 y 9\n")
         num = input("\nPATEA ARGENTINA 🦿: Ingrese el número de tiro: ")
         num_pateada = validar_input(num)
     
@@ -234,8 +234,8 @@ def selecciona_atajada_argentina():
     
     # Mientras sea menor a 1 o mayor a 9 vuelve a solicitar
     while num_atajada < 1 or num_atajada > 9:
-        print("Ingrese un número válido entre 1 y 9")
-        num = input("\ATAJA ARGENTINA 🧤: Ingrese el número donde atajar: ")
+        print("\nIngrese un número válido entre 1 y 9\n")
+        num = input("\nATAJA ARGENTINA 🧤: Ingrese el número donde atajar: ")
         num_atajada = validar_input(num)
     
     # Se genera un número aleatorio para que Países Bajos patee a un lugar aleatorio
