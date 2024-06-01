@@ -1,103 +1,72 @@
-
-import asyncio
+# time está importado con la finalidad de una mejor UX, ya que se pueden hacer esperas de tiempo
+# para que el usuario pueda ver el resultado de la pateada, a dónde fué el balón
+# mensajes de euforia y mientras la computadora "Países Bajos" "piensa" a dónde patear
+import time
+# random se importa para que Países Bajos pueda patear a un lugar aleatorio
 import random
 
+# Matriz que representa el arco de fútbol
 arco = [
-  [1,2,3],
-  [4,5,6],
-  [7,8,9],
+    [1,2,3],
+    [4,5,6],
+    [7,8,9],
 ]
 
+# Diccionario que contiene los marcadores de cada equipo
 marcadores = {
-  'argentina': [],
-  'paises_bajos': [],
+    'argentina': [],
+    'paises_bajos': [],
 }
 
-async def iniciar_muerte_subita():
-    imprimir_arco(True)
-    await selecciona_tiro_argentina(True)
-    if len(marcadores["argentina"]):
-        tiro_argentina = marcadores["argentina"][0]
-    if len(marcadores["paises_bajos"]):
-        tiro_paises_bajos = marcadores["paises_bajos"][0]
-
-    while tiro_paises_bajos == '🟥' and tiro_argentina == '🟥' or tiro_paises_bajos == '🟩' and tiro_argentina == '🟩':
-        marcadores["argentina"] = []
-        marcadores["paises_bajos"] = []
-        print("Otra ronda más!!!")
-            # await asyncio.sleep(2)
-        await iniciar_muerte_subita()
-
-    if marcadores["paises_bajos"][0] == '🟩' and marcadores["argentina"][0] == '🟥':
-        print("Gana Países Bajos pero porque compraron al árbitro >:V")
-    elif marcadores["paises_bajos"][0] == '🟥' and marcadores["argentina"][0] == '🟩':
-        print("GANA ARGENTINAAAAA")
-
-async def cambia_equipo(equipo, MS):
-    # num = -1 es que alguien gano - num = -2 van a muerte súbita
-    num = await verificar_ganador(MS)
-    if num == -1: 
-        return
-
+async def cambia_equipo(equipo):
     # Según el equipo que haya pateado, le toca al contrario.
     equipo = 'paises_bajos' if equipo == 'argentina' else 'argentina'
     imprimir_arco(MS)
     
     # Si el equipo que patea, volvemos a la función del flujo inicial, donde se solicita al usuario un número
     if equipo == 'argentina':
-        await selecciona_tiro_argentina(MS)
+        await selecciona_tiro_argentina()
     else:
         # Si el equipo que patea es países bajos, le hacemos saber al usuario, y hacemos una espera
         # de 2 segundos mientras Países bajos "piensa" a donde patear
         print("PATEA PAÍSES BAJOS")
-        # await asyncio.sleep(2)
-        num = 2#random.randint(1, 9)
+        await asyncio.sleep(2)
+        num = random.randint(1, 9)
         # Ejecutamos la pateada y repetimos flujo.
-        await patear('paises_bajos', num, MS)
-#####
+        await patear('paises_bajos', num)
 
-async def verificar_ganador(MS):
-    if MS:
-        print("Modo muerte subita")
-    else:
-        faltantes_argentina = 5 - len(marcadores['argentina'])
-        goles_argentina = sum(1 for x in marcadores["argentina"] if x == '🟩')
-        faltantes_paises_bajos = 5 - len(marcadores['paises_bajos'])
-        goles_paises_bajos = sum(1 for x in marcadores["paises_bajos"] if x == '🟩')
-        if faltantes_argentina + goles_argentina < goles_paises_bajos:
-            print("Gana Países Bajos pero porque compraron al árbitro >:V")
-            return -1
-        elif faltantes_paises_bajos + goles_paises_bajos < goles_argentina:
-            print("GANA ARGENTINA :D")
-            return -1
-        elif len(marcadores["argentina"]) == 5 and len(marcadores["paises_bajos"]) == 5:
-            marcadores["argentina"] = []
-            marcadores["paises_bajos"] = []
-            await iniciar_muerte_subita()
-            return -1
-
-async def patear(equipo, num, MS):
+async def patear(equipo, num):
     fila = (num - 1) // 3
     columna = (num - 1) % 3
     
-    # Actualizar la posición en el arco con "⚽️" para mostrarle visualmente al usuario a dónde fué el balón/disco
-    arco[fila][columna] = "⚽️"
+    # Por una cuestión visual, si el número pateado es 2, 5 u 8, se ataja en el mismo lugar así la manito sale junto al balón
+    if num_pateada in [2,5,8]:
+        num_atajada = num_pateada
     
-    # El éxito del tiro siempre será True, a menos que se haya seleccionado 2, 5 u 8
+    fila_atajada = (num_atajada - 1) // 3
+    columna_atajada = (num_atajada - 1) % 3
+    
     exito = True
-    if num in [2,5,8]:
+    
+    if num_pateada in [2,5,8] or num_pateada == num_atajada:
         exito = False
+    
+    if num_pateada == num_atajada:
+        arco[fila_pateada][columna_pateada] = '🧤⚽'
+    else: 
+        arco[fila_pateada][columna_pateada] = '⚽'
+        arco[fila_atajada][columna_atajada] = '🧤'
 
-    # Actualizamos el marcador y mostramos el arco con el nuevo marcador y mostrándo a dónde se pateó
     actualizar_marcador(equipo, exito)
     imprimir_arco(MS)
 
     # Volvemos a poner el número en la posición del arco
-    arco[fila][columna] = num
+    arco[fila_pateada][columna_pateada] = num_pateada
+    arco[fila_atajada][columna_atajada] = num_atajada
 
     # Un par de mensajes de eufória del partido Jeje.
     if exito and equipo == 'argentina':
-        print("¡GOL DE ARGENTINAAAAAAA VAMOOOOOOOOOOS 🍻🍾🎆🎇!")
+        print("⚽¡GOL DE ARGENTINAAAAAAA VAMOOOOOOOOOOS 🍻🍾🎆🎇!")
     elif not exito and equipo == 'argentina':
         print('AAAA CASI METEMOS GOOOL 😭😭😭')
     elif exito and equipo == 'paises_bajos':
@@ -106,30 +75,30 @@ async def patear(equipo, num, MS):
         print("Uff por poco nos meten gol 😅😅")
 
     # Esperamos 3 segundos para que el usuario pueda ver el resultado del tiro
-    # await asyncio.sleep(3)
+    await asyncio.sleep(3)
     
     # Cambio de equipo
-    await cambia_equipo(equipo, MS)
+    await cambia_equipo(equipo)
 
 def actualizar_marcador(equipo, exito):
     exito = "🟩" if exito else "🟥"
     marcadores[equipo].append(exito)
 
-def ver_contador(MS = False):
-    tiros_por_equipo = 1 if MS else 5
-    
+def ver_contador():
     tiros_argentina = ''.join(marcadores['argentina'])
-    faltantes_argentina = tiros_por_equipo - len(marcadores['argentina'])
+    faltantes_argentina = 5 - len(marcadores['argentina'])
     tiros_argentina = tiros_argentina + ''.join('⬜' * faltantes_argentina)
     
+    # Sumamos los cuadraditos 🟩 o 🟥 de los tiros ya realizados
     tiros_paises_bajos = ''.join(marcadores['paises_bajos'])
-    faltantes_paises_bajos = tiros_por_equipo - len(marcadores['paises_bajos'])
+    faltantes_paises_bajos = 5 - len(marcadores['paises_bajos'])
     tiros_paises_bajos = tiros_paises_bajos + ''.join('⬜' * faltantes_paises_bajos)
+
     print("\nARGENTINA    vs.    PAÍSES BAJOS")
     print(tiros_argentina, "        ",tiros_paises_bajos)
-
-def imprimir_arco(MS = False):
-    ver_contador(MS)
+  
+def imprimir_arco():
+    ver_contador()
     print("___________________________________________")
     print("|                                         |")
     print("|     ", arco[0][0], "     |     ", arco[0][1], "     |     ", arco[0][2], "     |")
@@ -151,21 +120,21 @@ def validar_input(num):
         return -1
 
 # Función para permitir al usuario ingresar a dónde quiere patear
-async def selecciona_tiro_argentina(MS = False):
+async def selecciona_tiro_argentina():
     num = input("PATEA ARGENTINA: Ingrese el número de tiro: ")
 
     # Validez de número entero
-    num_int = validar_input(num)
+    num_pateada = validar_input(num)
     
     # Mientras sea menor a 1 o mayor a 9 vuelve a solicitar
-    while num_int < 1 or num_int > 9:
-        print("Ingrese un número válido entre 1 y 9")
-        num = input("PATEA ARGENTINA: Ingrese el número de tiro: ")
-        num_int = validar_input(num)
+    while num_pateada < 1 or num_pateada > 9:
+        print("\nIngrese un número válido entre 1 y 9\n")
+        num = input("\nPATEA ARGENTINA 🦿: Ingrese el número de tiro: ")
+        num_pateada = validar_input(num)
     
     # Pateamos, enviandole el equipo que patea, y a dónde (num_int)
-    await patear('argentina', num_int, MS)
+    await patear('argentina', num_int)
 
 # Inicialización del programa
 imprimir_arco()
-asyncio.run(selecciona_tiro_argentina())
+selecciona_tiro_argentina()
